@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "CY2+DuSmGtbK5WfaKnxd/Mp5PLDkL96ArqnQYTJDx3iNinRIAL+17Y//+C2g69/1aqLyNb0NmwneJVI7BaQyfA==",
+  "success": true,
+  "projectFilePath": "/home/dw/projects/dotnet/terminalgames/CharForgeExample/CharForgeExample.csproj",
+  "expectedPackageFiles": [
+    "/home/dw/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.8/microsoft.aspnetcore.app.ref.8.0.8.nupkg.sha512"
+  ],
+  "logs": []
+}
