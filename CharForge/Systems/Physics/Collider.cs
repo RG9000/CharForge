@@ -1,7 +1,7 @@
 using CharForge;
 using CharForge.Systems;
 
-namespace CharForgeExample;
+namespace CharForge.Systems.Physics;
 public class Collider(int w, int h) : GameSystem
 {
     public int Width { get; set; } = w;

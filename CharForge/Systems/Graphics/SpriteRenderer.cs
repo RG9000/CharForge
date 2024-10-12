@@ -1,4 +1,4 @@
-namespace CharForge.Systems;
+namespace CharForge.Systems.Graphics;
 
 public class SpriteRenderer : GameSystem
 {

@@ -8,6 +8,8 @@ public class Scene()
     public readonly List<Entity> Entities = [];
     private bool KillScene = false;
 
+    public ConsoleKeyInfo? CurrentPressedKey;
+
     public void Spawn(Entity e)
     {
         SpawningEntities.Add(e);
@@ -108,6 +110,7 @@ public class Scene()
             }
 
             // Optionally, clear the console to update the screen per frame
+            CurrentPressedKey = null;
             Console.Clear();
         }
     }
@@ -120,6 +123,7 @@ public class Scene()
             if (Console.KeyAvailable) // Check if a key has been pressed
             {
                 var key = Console.ReadKey(intercept: true); // Read the key without showing it
+                CurrentPressedKey = key;
                 if (key.KeyChar == 'q'){
                     KillScene = true;
                 }

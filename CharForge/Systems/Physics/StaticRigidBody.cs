@@ -1,8 +1,4 @@
-using System.Buffers;
-using System.Security.Cryptography.X509Certificates;
-using CharForge.Systems;
-
-namespace CharForgeExample;
+namespace CharForge.Systems.Physics;
 
 public class StaticRigidBody : GameSystem
 {

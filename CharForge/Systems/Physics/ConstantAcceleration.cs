@@ -1,6 +1,4 @@
-using CharForge.Systems;
-using CharForgeExample;
-
+namespace CharForge.Systems.Physics;
 public class ConstantAcceleration : GameSystem
 {
     public ConstantAcceleration(float x, float y)

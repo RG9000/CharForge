@@ -1,5 +1,4 @@
-using CharForge;
-using CharForgeExample;
+namespace CharForge.Systems.Physics;
 
 public class RigidBody(float bounciness, float roughness) : StaticRigidBody
 {

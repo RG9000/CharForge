@@ -1,6 +1,4 @@
-using CharForge.Systems;
-using CharForgeExample;
-
+namespace CharForge.Systems.Physics;
 public class Impulse : GameSystem
 {
     public Impulse(float x, float y)
