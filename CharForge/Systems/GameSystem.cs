@@ -77,6 +77,12 @@ public abstract class GameSystem {
     {
         DependentTypes.AddRange(dependencies);
     }
+
+    protected ConsoleKey GetCurrentKeyPressed()
+    {
+        if (Owner?.Owner == null) return ConsoleKey.None;
+        return Owner.Owner.CurrentKeyPressed;
+    }
     
     
 }

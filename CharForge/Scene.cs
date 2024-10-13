@@ -1,6 +1,3 @@
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography;
-
 namespace CharForge;
 
 public class Scene(int targetFps = 20, bool showFPS = false)
@@ -52,7 +49,7 @@ public class Scene(int targetFps = 20, bool showFPS = false)
                 allSystems.AddRange(o.GetAllSystems());
             }
 
-            allSystems = allSystems.OrderBy(e => e.GetType().Name).ToList();
+            allSystems = [.. allSystems.OrderBy(e => e.GetType().Name)];
 
             // Update each system with the current input
             foreach (var s in allSystems)
