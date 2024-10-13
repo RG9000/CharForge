@@ -1,25 +1,11 @@
-using CharForge.Systems;
+﻿namespace CharForge;
 
-namespace CharForge;
-public class Entity
+public class Entity 
 {
-    public virtual void OnUpdate(){}
-    public virtual void OnInit(){}
+    private readonly List<GameSystem> Systems = [];
 
-    public Entity(string name)
+    public T? GetSystem<T> () where T : GameSystem
     {
-        Name = name;
-    }
-
-    public string Name {get; set;}
-    public Scene? Scene { get; set; }
-    public List<GameSystem> Systems { get; set; } = [];
-    public void SetScene(Scene scene)
-    {
-        Scene = scene;
-    }
-
-    public T? GetSystem<T>() {
         foreach (var s in Systems)
         {
             if (s is T ts)
@@ -29,5 +15,23 @@ public class Entity
         }
         return default;
     }
-
+    
+    public Entity AddSystem(GameSystem system) 
+    {
+        Systems.Add(system);
+        return this;
+    }
+    public Entity RemoveSystemsOfType<T>() where T : GameSystem 
+    {
+        bool noMoreSystemsOfType = false;
+        while (!noMoreSystemsOfType)
+        {
+            var sys = GetSystem<T>();
+            if (sys == default)
+            {
+                noMoreSystemsOfType = true;
+            }
+        }
+        return this;
+    }
 }
