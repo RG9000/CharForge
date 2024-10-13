@@ -4,11 +4,12 @@ public abstract class GameSystem {
 
     internal bool FinishedInitializing {get; private set;}
     private readonly List<Type> DependentTypes = [];
-    protected Entity? Owner = null;
+    public Entity? Owner = null;
+    private int InitializationAttempts = 0;
 
     private readonly List<GameSystem> Dependencies = [];
 
-    protected T GetDependentSystem<T>() where T : GameSystem
+    public T GetDependentSystem<T>() where T : GameSystem
     {
         foreach (var s in Dependencies)
         {
@@ -17,7 +18,8 @@ public abstract class GameSystem {
                 return ts;
             }
         }
-        throw new Exception("Tried to get a dependent system that does not exist. Have you declared it in the constructor and added it to the Entity in question?");
+
+        throw new Exception("Tried to get a dependent system for '"+ this.GetType().ToString() + "' and failed. Have you referenced it in the system's constructor?");
     }
 
     internal GameSystem SetOwner(Entity e) {
@@ -29,14 +31,14 @@ public abstract class GameSystem {
 
     public void OnInit()
     {
-        Console.WriteLine("running base constructor");
         if (Owner == null) return;
-        Console.WriteLine("Owner was initted");
-        Console.WriteLine("dependenttypes: " + DependentTypes.Count);
+
+        if (InitializationAttempts >= 50)
+        {
+            throw new Exception("Unable to initialize system '" + this.GetType() + "'. It looks like it has a dependency that you didn't add to the Owner.");
+        }
 
         //These match, so everything must have been initialized
-        Console.WriteLine("Types count " + DependentTypes.Count);
-        Console.WriteLine("actual count " + Dependencies.Count);
         if (DependentTypes.Count == Dependencies.Count)
         {
             FinishedInitializing = true;
@@ -57,6 +59,7 @@ public abstract class GameSystem {
                 }
             }
         }
+        InitializationAttempts += 1;
     }
 
     /// <summary>

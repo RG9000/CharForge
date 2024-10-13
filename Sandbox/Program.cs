@@ -1,10 +1,9 @@
 ﻿using CharForge;
-
-Console.WriteLine("Hello, World!");
+using Sandbox;
 
 var scene = new Scene();
 
-scene.AddEntity(new Entity().AddSystem(new TestSysA()).AddSystem(new TestSysB()));
+scene.AddEntity(new Ball());
 
 await scene.Activate();
 

@@ -1,5 +1,6 @@
 ﻿namespace CharForge
 {
+
     /// <summary>
     /// Represents a game entity that can hold and manage various <see cref="GameSystem"/> objects.
     /// Each entity has a unique identifier (Id), and systems can be dynamically added or removed.
@@ -12,6 +13,7 @@
     /// this if you need to keep track of the Object </param>
     public class Entity(string? id = null)
     {
+        public Scene? Owner {get; private set;} = null;
         private readonly List<GameSystem> Systems = [];
         
         /// <summary>
@@ -22,6 +24,11 @@
         /// <summary>
         /// Gets all systems associated with this Entity 
         /// </summary>
+
+        internal Entity SetOwner(Scene e) {
+            Owner = e;
+            return this;
+        }
 
         internal List<GameSystem> GetAllSystems()
         {
