@@ -4,7 +4,7 @@ using CharForge.Systems.Graphics;
 namespace Pong;
 
 public class Paddle : Entity {
-    public Paddle() {
+    public Paddle(bool isLeft = true) {
         AddSystem(new ConsoleSpriteRenderSystem(() => [
             "XX",
             "XX",
@@ -13,7 +13,14 @@ public class Paddle : Entity {
             "XX",
             "XX",
         ]));
-        AddSystem(new PositionSystem(25, 30));
+        if (isLeft)
+        {
+            AddSystem(new PositionSystem(2, 10));
+        }
+        else 
+        {
+            AddSystem(new PositionSystem(30, 10));
+        }
     }
 }
 
@@ -24,12 +31,11 @@ public class PlayerPaddle : Paddle {
     }
 }
 
-public class PlayerPaddleControlSystem(ConsoleKey upKey = ConsoleKey.W, ConsoleKey downKey = ConsoleKey.S, bool isLeft = true) : GameSystem(typeof(PositionSystem))
+public class PlayerPaddleControlSystem(ConsoleKey upKey = ConsoleKey.W, ConsoleKey downKey = ConsoleKey.S) : GameSystem(typeof(PositionSystem))
 {
 
     public ConsoleKey UpKey { get; set; } = upKey;
     public ConsoleKey DownKey { get; set; } = downKey;
-    public bool IsLeft { get; set; } = isLeft;
 
     public override void OnUpdate()
     {

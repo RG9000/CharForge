@@ -9,7 +9,7 @@ public class Scene(int targetFps = 20, bool showFPS = false)
 
     private readonly bool ShowFPS = showFPS;
 
-    private readonly List<Entity> Entities = [];
+    internal readonly List<Entity> Entities = [];
 
     public ConsoleKey LastKeyPressed { get; private set; }
     public ConsoleKey CurrentKeyPressed { get; private set; }
@@ -21,72 +21,60 @@ public class Scene(int targetFps = 20, bool showFPS = false)
         Console.ForegroundColor = ConsoleColor.White;
 
         Entities.ForEach(e => e.OnInit());
-        _ = Task.Run(ReadKeysAsync);
+        var inputTask = Task.Run(ReadKeysAsync);
         await GameLoop();
+        inputTask.Dispose();
     }
     private async Task GameLoop()
     {
-        try {
-        int delayPerFrame = 1000 / TargetFPS;
-
-        while (true)
+        try
         {
-            if (KillScene)
+            int delayPerFrame = 1000 / TargetFPS;
+
+            while (true)
             {
-                return;
+                if (KillScene)
+                {
+                    return;
+                }
+
+                // Record the start time of the frame
+                var frameStartTime = DateTime.Now;
+
+                // Capture the buffered input and store it in CurrentKeyPressed
+                CurrentKeyPressed = _keyBuffer ?? ConsoleKey.None;
+
+                UpdateSystems();
+                // After processing, clear the current key input for the next frame
+                _keyBuffer = null;
+                CurrentKeyPressed = ConsoleKey.None;
+
+                var elapsedMilliseconds = (DateTime.Now - frameStartTime).TotalMilliseconds;
+                var remainingTime = delayPerFrame - elapsedMilliseconds;
+                var realFPS = fpsTracker.TrackFrame(elapsedMilliseconds);
+
+                if (ShowFPS)
+                {
+                    Console.SetCursorPosition(0, 0);
+                    Console.Write($"Real FPS: {realFPS:F2}");
+                }
+
+                if (remainingTime > 0)
+                {
+                    await Task.Delay((int)remainingTime);
+                }
+
+                // Clear screen, but do it after input is processed
+                Console.Clear();
             }
-
-            // Record the start time of the frame
-            var frameStartTime = DateTime.Now;
-
-            // Capture the buffered input and store it in CurrentKeyPressed
-            CurrentKeyPressed = _keyBuffer ?? ConsoleKey.None;
-
-            // Gather all systems from entities and order them by name
-            var allSystems = new List<GameSystem>();
-            foreach (var o in Entities)
-            {
-                allSystems.AddRange(o.GetAllSystems());
-            }
-
-            allSystems = [.. allSystems.OrderBy(e => e.GetType().Name)];
-
-            // Update each system with the current input
-            foreach (var s in allSystems)
-            {
-                s.OnUpdate();
-            }
-
-            // After processing, clear the current key input for the next frame
-            _keyBuffer = null;
-            CurrentKeyPressed = ConsoleKey.None;
-
-            var elapsedMilliseconds = (DateTime.Now - frameStartTime).TotalMilliseconds;
-            var remainingTime = delayPerFrame - elapsedMilliseconds;
-            var realFPS = fpsTracker.TrackFrame(elapsedMilliseconds);
-
-            if (ShowFPS)
-            {
-                Console.SetCursorPosition(0, 0);
-                Console.Write($"Real FPS: {realFPS:F2}");
-            }
-
-            if (remainingTime > 0)
-            {
-                await Task.Delay((int)remainingTime);
-            }
-
-            // Clear screen, but do it after input is processed
-            Console.Clear();
         }
-        } catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e.Message);
             Console.WriteLine(e.InnerException?.Message);
             KillScene = true;
         }
     }
-
 
     public Scene AddEntity(Entity e)
     {
@@ -131,5 +119,63 @@ public class Scene(int targetFps = 20, bool showFPS = false)
             await Task.Delay(50); // Adjust this delay as needed
         }
     }
+    #region (LLM Generated)
+    // The following code was generated via chat-gpt
+    public void UpdateSystems()
+    {
+        var systems = new List<GameSystem>();
+
+        // Collect all systems from all entities
+        foreach (var entity in Entities)
+        {
+            systems.AddRange(entity.Systems);
+        }
+
+        // Perform topological sort based on dependencies
+        var sortedSystems = TopologicalSort(systems);
+
+        // Update systems in sorted order
+        foreach (var system in sortedSystems)
+        {
+            system.OnUpdate();
+        }
+    }
+
+    private List<GameSystem> TopologicalSort(List<GameSystem> systems)
+    {
+        var sorted = new List<GameSystem>();
+        var visited = new Dictionary<GameSystem, bool>();
+
+        foreach (var system in systems)
+        {
+            Visit(system, visited, sorted);
+        }
+
+        return sorted;
+    }
+
+    private void Visit(GameSystem system, Dictionary<GameSystem, bool> visited, List<GameSystem> sorted)
+    {
+        if (visited.TryGetValue(system, out var inProcess))
+        {
+            if (inProcess)
+            {
+                throw new Exception("Cyclic dependency detected in system dependencies.");
+            }
+            // Already visited
+            return;
+        }
+
+        visited[system] = true;
+
+        foreach (var dependency in system.Dependencies)
+        {
+            Visit(dependency, visited, sorted);
+        }
+
+        visited[system] = false;
+        sorted.Add(system);
+    }
+    #endregion
 
 }

@@ -7,8 +7,36 @@ public abstract class GameSystem {
     public Entity? Owner = null;
     private int InitializationAttempts = 0;
 
-    private readonly List<GameSystem> Dependencies = [];
+    internal readonly List<GameSystem> Dependencies = [];
+    
+    /// <summary>
+    /// Gets all the systems in the current scene of the provided type, ordered by Entity ID.
+    /// </summary>
+    /// <param name="includeSelf">
+    /// Pass this in to return systems associated with the same object as the caller
+    /// </param>
+    public List<T> GetSystemsInScene<T>(bool includeSelf = false) where T : GameSystem
+    {
+        if (Owner?.Owner == null) throw new Exception("Entity " +Owner?.Id+ " not attached to a Scene. Only call 'GetSystemsInScene' during OnUpdate calls");
+        var retSystems = new List<T>();
+        foreach (var e in Owner.Owner.Entities)
+        {
+            if (!includeSelf && e == Owner) continue;
+            foreach (var s in e.Systems)
+            {
+                if (s is T ts)
+                {
+                    retSystems.Add(ts);
+                }
+            }
+        }
 
+        return [.. retSystems.OrderBy(e => e.Owner?.Id)];
+    }
+    
+    /// <summary>
+    /// Gets the system matching the provided type on the same Entity as the caller
+    /// </summary>
     public T GetDependentSystem<T>() where T : GameSystem
     {
         foreach (var s in Dependencies)
@@ -83,6 +111,6 @@ public abstract class GameSystem {
         if (Owner?.Owner == null) return ConsoleKey.None;
         return Owner.Owner.CurrentKeyPressed;
     }
-    
-    
+
+
 }

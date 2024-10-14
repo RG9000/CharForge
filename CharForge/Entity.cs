@@ -14,7 +14,7 @@
     public class Entity(string? id = null)
     {
         public Scene? Owner {get; private set;} = null;
-        private readonly List<GameSystem> Systems = [];
+        internal readonly List<GameSystem> Systems = [];
         
         /// <summary>
         /// A unique identifier for the entity. If no ID is provided, a new GUID will be generated.
