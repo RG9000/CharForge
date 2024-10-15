@@ -119,74 +119,78 @@ public class Scene(int targetFps = 20, bool showFPS = false)
             await Task.Delay(50); // Adjust this delay as needed
         }
     }
-    #region (LLM Generated)
-    // The following code was generated via chat-gpt
     public void UpdateSystems()
     {
         var systems = new List<GameSystem>();
 
-        // Collect all systems from all entities
         foreach (var entity in Entities)
         {
             systems.AddRange(entity.Systems);
         }
 
-        // Perform topological sort based on dependencies
         var sortedSystems = TopologicalSort(systems);
 
-        // Update systems in sorted order
         foreach (var system in sortedSystems)
         {
             system.OnUpdate();
         }
     }
 
+    #region (LLM Generated)
+    // The following code was generated via chat-gpt
     private List<GameSystem> TopologicalSort(List<GameSystem> systems)
     {
         var sorted = new List<GameSystem>();
-        var visited = new Dictionary<GameSystem, bool>();
+        var visited = new HashSet<GameSystem>();  // Tracks fully visited system instances
+        var inProcess = new HashSet<GameSystem>(); // Tracks system instances currently being processed
 
         foreach (var system in systems)
         {
-            Visit(system, visited, sorted, systems);
+            Visit(system, visited, inProcess, sorted, systems);
         }
 
         return sorted;
     }
 
-    private static void Visit(GameSystem system, Dictionary<GameSystem, bool> visited, List<GameSystem> sorted, List<GameSystem> allSystems)
+    private void Visit(GameSystem system, HashSet<GameSystem> visited, HashSet<GameSystem> inProcess, List<GameSystem> sorted, List<GameSystem> allSystems)
     {
-        if (visited.TryGetValue(system, out var inProcess))
+        if (visited.Contains(system))
         {
-            if (inProcess)
+            return; // Already fully visited and processed
+        }
+
+        if (inProcess.Contains(system))
+        {
+            throw new Exception($"Cyclic dependency detected in system {system.GetType()} for entity {system.Owner?.Id}.");
+        }
+
+        // Mark the system as being in process
+        inProcess.Add(system);
+
+        // Visit dependencies
+        foreach (var dependencyType in system.DependentTypes)
+        {
+            var dependency = system.Owner?.Systems.FirstOrDefault(s => s.GetType() == dependencyType);
+            if (dependency != null)
             {
-                throw new Exception("Cyclic dependency detected in system dependencies. (" + system.GetType() + ")");
-            }
-            return; // Already visited
-        }
-
-        visited[system] = true;
-
-        // Ensure dependencies are visited before this system
-        foreach (var dependency in system.RunUpdateAfter)
-        {
-            var depSystem = allSystems.FirstOrDefault(s => s.GetType() == dependency);
-            if (depSystem != null)
-            {
-                Visit(depSystem, visited, sorted, allSystems);
+                Visit(dependency, visited, inProcess, sorted, allSystems);
             }
         }
 
-        // Ensure this system is visited before its MustExecuteBefore dependencies
-        foreach (var mustExecuteAfter in allSystems.Where(s => s.RunUpdateAfter.Contains(system.GetType())))
+        // Visit systems that must execute after this system
+        foreach (var mustExecuteAfter in allSystems.Where(s => s.RunUpdateAfter.Contains(system.GetType()) && s.Owner != system.Owner))
         {
-            Visit(mustExecuteAfter, visited, sorted, allSystems);
+            Visit(mustExecuteAfter, visited, inProcess, sorted, allSystems);
         }
 
-        visited[system] = false;
+        // Mark the system as fully processed
+        inProcess.Remove(system);
+        visited.Add(system);
+
+        // Add to sorted list after all dependencies are visited
         sorted.Add(system);
     }
-
+ 
     #endregion
 
 }
