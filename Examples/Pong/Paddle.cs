@@ -27,10 +27,16 @@ public class Paddle : Entity {
     }
 }
 
-public class PlayerPaddle : Paddle {
-    public PlayerPaddle() : base()
+public class Player1Paddle : Paddle {
+    public Player1Paddle() : base()
     {
         AddSystem(new PlayerPaddleControlSystem());
+    }
+}
+public class Player2Paddle : Paddle {
+    public Player2Paddle() : base(false)
+    {
+        AddSystem(new PlayerPaddleControlSystem(ConsoleKey.UpArrow, ConsoleKey.DownArrow));
     }
 }
 

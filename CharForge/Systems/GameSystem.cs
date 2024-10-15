@@ -19,7 +19,7 @@ public abstract class GameSystem
     /// </param>
     public List<T> GetSystemsInScene<T>(bool includeSelf = false) where T : GameSystem
     {
-        if (Owner?.Owner == null) throw new Exception("Entity " + Owner?.Id + " not attached to a Scene. Only call 'GetSystemsInScene' during OnUpdate calls");
+        if (Owner?.Owner == null) throw new Exception("Entity " + Owner?.Id + " not attached to a Scene. Only call 'GetSystemsInScene' during OnUpdate calls.");
         var retSystems = new List<T>();
         foreach (var e in Owner.Owner.Entities)
         {

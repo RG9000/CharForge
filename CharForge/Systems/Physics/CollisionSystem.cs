@@ -2,10 +2,8 @@ using System.Runtime.CompilerServices;
 
 namespace CharForge.Systems.Physics;
 
-public record CollisionInfo(CollisionSystem otherCollider, CollisionSide collisionSide)
+public record CollisionInfo(CollisionSystem OtherCollider, CollisionSide CollisionSide)
 {
-    readonly CollisionSystem otherCollider = otherCollider;
-    readonly CollisionSide CollisionSide = collisionSide;
 }
 
 public enum CollisionSide
@@ -17,7 +15,7 @@ public enum CollisionSide
 }
 
 public class CollisionSystem(float width, float height)
-    : GameSystem(dependencies: new Type[] {typeof(PositionSystem)}, runUpdateAfter: new Type[] {typeof(PositionSystem)})
+    : GameSystem(dependencies: new Type[] {typeof(PositionSystem)})
 {
     public float Width { get; private set; } = width;
     public float Height { get; private set; } = height;
@@ -38,7 +36,7 @@ public class CollisionSystem(float width, float height)
         float myX = myPosition.X;
         float myY = myPosition.Y;
 
-        for (int i = 0; i < otherColliders.Count - 1; i++)
+        for (int i = 0; i < otherColliders.Count; i++)
         {
             float otherX = otherPositions[i].X;
             float otherY = otherPositions[i].Y;
