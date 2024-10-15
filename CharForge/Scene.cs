@@ -21,9 +21,8 @@ public class Scene(int targetFps = 20, bool showFPS = false)
         Console.ForegroundColor = ConsoleColor.White;
 
         Entities.ForEach(e => e.OnInit());
-        var inputTask = Task.Run(ReadKeysAsync);
+        _ = Task.Run(ReadKeysAsync);
         await GameLoop();
-        inputTask.Dispose();
     }
     private async Task GameLoop()
     {
@@ -75,6 +74,7 @@ public class Scene(int targetFps = 20, bool showFPS = false)
             KillScene = true;
         }
     }
+
 
     public Scene AddEntity(Entity e)
     {
@@ -148,34 +148,45 @@ public class Scene(int targetFps = 20, bool showFPS = false)
 
         foreach (var system in systems)
         {
-            Visit(system, visited, sorted);
+            Visit(system, visited, sorted, systems);
         }
 
         return sorted;
     }
 
-    private void Visit(GameSystem system, Dictionary<GameSystem, bool> visited, List<GameSystem> sorted)
+    private static void Visit(GameSystem system, Dictionary<GameSystem, bool> visited, List<GameSystem> sorted, List<GameSystem> allSystems)
     {
         if (visited.TryGetValue(system, out var inProcess))
         {
             if (inProcess)
             {
-                throw new Exception("Cyclic dependency detected in system dependencies.");
+                throw new Exception("Cyclic dependency detected in system dependencies. (" + system.GetType() + ")");
             }
-            // Already visited
-            return;
+            return; // Already visited
         }
 
         visited[system] = true;
 
-        foreach (var dependency in system.Dependencies)
+        // Ensure dependencies are visited before this system
+        foreach (var dependency in system.RunUpdateAfter)
         {
-            Visit(dependency, visited, sorted);
+            var depSystem = allSystems.FirstOrDefault(s => s.GetType() == dependency);
+            if (depSystem != null)
+            {
+                Visit(depSystem, visited, sorted, allSystems);
+            }
+        }
+
+        // Ensure this system is visited before its MustExecuteBefore dependencies
+        foreach (var mustExecuteAfter in allSystems.Where(s => s.RunUpdateAfter.Contains(system.GetType())))
+        {
+            Visit(mustExecuteAfter, visited, sorted, allSystems);
         }
 
         visited[system] = false;
         sorted.Add(system);
     }
+
     #endregion
 
 }

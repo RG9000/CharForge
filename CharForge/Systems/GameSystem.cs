@@ -1,14 +1,16 @@
 namespace CharForge;
 
-public abstract class GameSystem {
+public abstract class GameSystem
+{
 
-    internal bool FinishedInitializing {get; private set;}
-    private readonly List<Type> DependentTypes = [];
+    internal bool FinishedInitializing { get; private set; }
+    internal readonly List<Type> DependentTypes = [];
+    internal List<Type> RunUpdateAfter = [];
     public Entity? Owner = null;
     private int InitializationAttempts = 0;
 
     internal readonly List<GameSystem> Dependencies = [];
-    
+
     /// <summary>
     /// Gets all the systems in the current scene of the provided type, ordered by Entity ID.
     /// </summary>
@@ -17,7 +19,7 @@ public abstract class GameSystem {
     /// </param>
     public List<T> GetSystemsInScene<T>(bool includeSelf = false) where T : GameSystem
     {
-        if (Owner?.Owner == null) throw new Exception("Entity " +Owner?.Id+ " not attached to a Scene. Only call 'GetSystemsInScene' during OnUpdate calls");
+        if (Owner?.Owner == null) throw new Exception("Entity " + Owner?.Id + " not attached to a Scene. Only call 'GetSystemsInScene' during OnUpdate calls");
         var retSystems = new List<T>();
         foreach (var e in Owner.Owner.Entities)
         {
@@ -33,7 +35,7 @@ public abstract class GameSystem {
 
         return [.. retSystems.OrderBy(e => e.Owner?.Id)];
     }
-    
+
     /// <summary>
     /// Gets the system matching the provided type on the same Entity as the caller
     /// </summary>
@@ -47,14 +49,15 @@ public abstract class GameSystem {
             }
         }
 
-        throw new Exception("Tried to get a dependent system for '"+ this.GetType().ToString() + "' and failed. Have you referenced it in the system's constructor?");
+        throw new Exception("Tried to get a dependent system for '" + this.GetType().ToString() + "' and failed. Have you referenced it in the system's constructor?");
     }
 
-    internal GameSystem SetOwner(Entity e) {
+    internal GameSystem SetOwner(Entity e)
+    {
         Owner = e;
         return this;
     }
-    
+
     public abstract void OnUpdate();
 
     public void OnInit()
@@ -74,7 +77,7 @@ public abstract class GameSystem {
         }
 
         //Otherwise, try and initialize all the dependencies
-        foreach(var d in DependentTypes)
+        foreach (var d in DependentTypes)
         {
             var method = Owner.GetType().GetMethod("GetSystem");
             if (method != null)
@@ -101,9 +104,10 @@ public abstract class GameSystem {
     /// </code>
     /// </param>
 
-    protected GameSystem(params Type[] dependencies)
+    protected GameSystem(Type[]? dependencies = null, Type[]? runUpdateAfter = null)
     {
-        DependentTypes.AddRange(dependencies);
+        DependentTypes.AddRange(dependencies ?? []);
+        RunUpdateAfter.AddRange(runUpdateAfter ?? []);
     }
 
     protected ConsoleKey GetCurrentKeyPressed()

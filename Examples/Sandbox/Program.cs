@@ -1,9 +1,8 @@
 ﻿using CharForge;
-using Sandbox;
 
 var scene = new Scene();
 
-scene.AddEntity(new Ball());
+scene.AddEntity(new Entity());
 
 await scene.Activate();
 

@@ -1,14 +1,11 @@
 using CharForge;
 
-public class PositionSystem : GameSystem
+namespace CharForge.Systems;
+
+public class PositionSystem(float x = 0f, float y = 0f) : GameSystem([],[])
 {
-    public PositionSystem(float x = 0f, float y = 0f)
-    {
-        X = x;
-        Y = y;
-    }
-    public float X {get; private set;}
-    public float Y {get; private set;}
+    public float X { get; private set; } = x;
+    public float Y { get; private set; } = y;
 
     public void SetPosition(float x, float y)
     {

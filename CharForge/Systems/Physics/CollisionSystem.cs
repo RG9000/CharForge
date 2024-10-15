@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace CharForge.Systems.Physics;
 
 public record CollisionInfo(CollisionSystem otherCollider, CollisionSide collisionSide)
@@ -15,7 +17,7 @@ public enum CollisionSide
 }
 
 public class CollisionSystem(float width, float height)
-    : GameSystem(typeof(PositionSystem))
+    : GameSystem(dependencies: new Type[] {typeof(PositionSystem)}, runUpdateAfter: new Type[] {typeof(PositionSystem)})
 {
     public float Width { get; private set; } = width;
     public float Height { get; private set; } = height;

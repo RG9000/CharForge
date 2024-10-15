@@ -1,5 +1,7 @@
 using CharForge;
+using CharForge.Systems;
 using CharForge.Systems.Graphics;
+using CharForge.Systems.Physics;
 
 namespace Pong;
 
@@ -21,6 +23,7 @@ public class Paddle : Entity {
         {
             AddSystem(new PositionSystem(30, 10));
         }
+        AddSystem(new CollisionSystem(2,6));
     }
 }
 
@@ -31,7 +34,8 @@ public class PlayerPaddle : Paddle {
     }
 }
 
-public class PlayerPaddleControlSystem(ConsoleKey upKey = ConsoleKey.W, ConsoleKey downKey = ConsoleKey.S) : GameSystem(typeof(PositionSystem))
+public class PlayerPaddleControlSystem(ConsoleKey upKey = ConsoleKey.W, ConsoleKey downKey = ConsoleKey.S) 
+    : GameSystem(new Type[] {typeof(PositionSystem)}, [])
 {
 
     public ConsoleKey UpKey { get; set; } = upKey;
