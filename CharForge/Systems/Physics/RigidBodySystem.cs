@@ -12,7 +12,6 @@ public class RigidBodySystem(float angle = 0, float speed = 0)
     public void MoveForward(float lambda = 1f)
     {
         var deltaTime = GetDeltaTime();
-        Console.WriteLine($"Delta Time: {deltaTime}");
         float aRads = (float)(Angle * (Math.PI / 180));
         float vX = (float)(Speed * Math.Cos(aRads));
         float vY = (float)(Speed * Math.Sin(aRads));
