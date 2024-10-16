@@ -7,7 +7,7 @@ public class ConsoleSpriteRenderSystem(Func<List<string>> sprite, ConsoleColor f
     public ConsoleColor FGColor { get; set; } = fgColor;
     public ConsoleColor BGColor { get; set; } = bgColor;
 
-    public override void OnUpdate()
+    public override void OnRender()
     {
         var position = GetDependentSystem<PositionSystem>();
         var drawnX = (int)Math.Floor(position.X);
@@ -26,5 +26,6 @@ public class ConsoleSpriteRenderSystem(Func<List<string>> sprite, ConsoleColor f
                 yIndex += 1;
             }
         }
+
     }
 }

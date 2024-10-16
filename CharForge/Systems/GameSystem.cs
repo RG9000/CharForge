@@ -58,7 +58,15 @@ public abstract class GameSystem
         return this;
     }
 
-    public abstract void OnUpdate();
+    public virtual void OnUpdate(){}
+
+    public virtual void OnRender(){}
+
+    public float GetDeltaTime()
+    {
+        if (Owner == null) throw new Exception("Owner was null while attempting to get Delta");
+        return Owner.GetDeltaTime();
+    }
 
     public void OnInit()
     {
