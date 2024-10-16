@@ -6,6 +6,9 @@ using Pong;
 var scene = new Scene();
 
 scene
+    .AddEntity(new Entity()
+        .AddSystem(new CameraSystem())
+        .AddSystem(new PositionSystem(0,0)))
     .AddEntity(new Player1Paddle())
     .AddEntity(new Player2Paddle())
     .AddEntity(new Ball())
