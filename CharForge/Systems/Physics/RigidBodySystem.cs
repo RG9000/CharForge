@@ -11,13 +11,15 @@ public class RigidBodySystem(float angle = 0, float speed = 0)
 
     public void MoveForward(float lambda = 1f)
     {
+        var deltaTime = GetDeltaTime();
+        Console.WriteLine($"Delta Time: {deltaTime}");
         float aRads = (float)(Angle * (Math.PI / 180));
         float vX = (float)(Speed * Math.Cos(aRads));
         float vY = (float)(Speed * Math.Sin(aRads));
         var positionSystem = GetDependentSystem<PositionSystem>();
         var x = positionSystem.X;
         var y = positionSystem.Y;
-        positionSystem.SetPosition(x + (vX * lambda), y + (vY * lambda));
+        positionSystem.SetPosition(x + (vX * lambda * deltaTime), y + (vY * lambda * deltaTime));
     }
 
     public override void OnUpdate()

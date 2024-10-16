@@ -21,6 +21,12 @@
         /// </summary>
         public string Id = id == default ? Guid.NewGuid().ToString() : id;
 
+        public float GetDeltaTime()
+        {
+            if (Owner == null) throw new Exception("Owner was null while attempting to get Delta");
+            return Owner.DeltaTime;
+        }
+
         /// <summary>
         /// Gets all systems associated with this Entity 
         /// </summary>

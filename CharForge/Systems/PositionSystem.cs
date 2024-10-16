@@ -12,9 +12,4 @@ public class PositionSystem(float x = 0f, float y = 0f) : GameSystem([],[])
         X = x;
         Y = y;
     }
-
-    public override void OnUpdate()
-    {
-        //pass;
-    }
 }

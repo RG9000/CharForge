@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace CharForge;
 
 public class Scene(int targetFps = 20, bool showFPS = false)
@@ -15,6 +17,8 @@ public class Scene(int targetFps = 20, bool showFPS = false)
     public ConsoleKey CurrentKeyPressed { get; private set; }
     private ConsoleKey? _keyBuffer;
 
+    public float DeltaTime { get; private set; }
+
     public async Task Activate()
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -22,9 +26,38 @@ public class Scene(int targetFps = 20, bool showFPS = false)
 
         Entities.ForEach(e => e.OnInit());
         _ = Task.Run(ReadKeysAsync);
+        _ = Task.Run(RenderLoop);
         await GameLoop();
     }
+
     private async Task GameLoop()
+    {
+        long previousElapsedTime = 0;
+        Stopwatch stopwatch = new();
+        stopwatch.Start();
+
+        while (true)
+        {
+            long currentElapsedTime = stopwatch.ElapsedMilliseconds;
+            long delta = currentElapsedTime - previousElapsedTime;
+            DeltaTime = delta/1000f;
+            previousElapsedTime = currentElapsedTime;
+
+            if (KillScene)
+            {
+                return;
+            }
+
+            CurrentKeyPressed = _keyBuffer ?? ConsoleKey.None;
+            UpdateSystems(render: false);
+            _keyBuffer = null;
+            CurrentKeyPressed = ConsoleKey.None;
+
+            await Task.Delay(16);
+        }
+    }
+
+    private async Task RenderLoop()
     {
         try
         {
@@ -32,21 +65,12 @@ public class Scene(int targetFps = 20, bool showFPS = false)
 
             while (true)
             {
-                if (KillScene)
-                {
-                    return;
-                }
 
                 // Record the start time of the frame
                 var frameStartTime = DateTime.Now;
 
-                // Capture the buffered input and store it in CurrentKeyPressed
-                CurrentKeyPressed = _keyBuffer ?? ConsoleKey.None;
-
-                UpdateSystems();
+                UpdateSystems(render: true);
                 // After processing, clear the current key input for the next frame
-                _keyBuffer = null;
-                CurrentKeyPressed = ConsoleKey.None;
 
                 var elapsedMilliseconds = (DateTime.Now - frameStartTime).TotalMilliseconds;
                 var remainingTime = delayPerFrame - elapsedMilliseconds;
@@ -63,7 +87,6 @@ public class Scene(int targetFps = 20, bool showFPS = false)
                     await Task.Delay((int)remainingTime);
                 }
 
-                // Clear screen, but do it after input is processed
                 Console.Clear();
             }
         }
@@ -119,7 +142,7 @@ public class Scene(int targetFps = 20, bool showFPS = false)
             await Task.Delay(50); // Adjust this delay as needed
         }
     }
-    public void UpdateSystems()
+    public void UpdateSystems(bool render)
     {
         var systems = new List<GameSystem>();
 
@@ -132,7 +155,14 @@ public class Scene(int targetFps = 20, bool showFPS = false)
 
         foreach (var system in sortedSystems)
         {
-            system.OnUpdate();
+            if (render)
+            {
+                system.OnRender();
+            }
+            else
+            {
+                system.OnUpdate();
+            }
         }
     }
 
@@ -190,7 +220,7 @@ public class Scene(int targetFps = 20, bool showFPS = false)
         // Add to sorted list after all dependencies are visited
         sorted.Add(system);
     }
- 
+
     #endregion
 
 }

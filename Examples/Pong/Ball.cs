@@ -11,7 +11,7 @@ public class Ball : Entity
         AddSystem(new ConsoleSpriteRenderSystem(() => ["O"]));
         AddSystem(new PositionSystem(15,10));
         AddSystem(new CollisionSystem(1,1));
-        AddSystem(new RigidBodySystem(190, 0.5f));
+        AddSystem(new RigidBodySystem(190, 1f));
         AddSystem(new BallLoggingSystem());
     }
 
