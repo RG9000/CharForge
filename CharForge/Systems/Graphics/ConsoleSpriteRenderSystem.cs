@@ -12,8 +12,6 @@ public class ConsoleSpriteRenderSystem(Func<List<string>> sprite, ConsoleColor f
         var position = GetDependentSystem<PositionSystem>();
         var drawnX = (int)Math.Floor(position.X);
         var drawnY = (int)Math.Floor(position.Y);
-        Console.ForegroundColor = FGColor;
-        Console.BackgroundColor = BGColor;
         foreach (var c in GetSystemsInScene<CameraSystem>())
         {
             c.Draw(Sprite, drawnX, drawnY);
