@@ -3,13 +3,30 @@ using CharForge.Systems;
 
 namespace CharForge.Systems.Graphics;
 
-public class CameraSystem() : GameSystem(dependencies: new Type[] {typeof(PositionSystem)})
+public class CameraSystem(int xSize, int ySize) : GameSystem(dependencies: new Type[] {typeof(PositionSystem)})
 {
+    private readonly int XSize = xSize;
+    private readonly int YSize = ySize;
+
     public void Draw(Func<List<string>>? fSprite, int x, int y, ConsoleColor fg = ConsoleColor.White, ConsoleColor bg = ConsoleColor.Black)
     {
         var positionSystem = GetDependentSystem<PositionSystem>();
 
-        //HERE WE SHOULD FIGURE OUT IF THE SPRITE IS OUT OF BOUNDS ENTIRELY
+        int minX = (int)Math.Floor(positionSystem.X);
+        int minY = (int)Math.Floor(positionSystem.Y);
+        var maxX = minX + XSize;
+        var maxY = minY + YSize;
+
+        if (fSprite == null) return;
+
+        var sprite = fSprite();
+
+        if (sprite == null) return;
+
+        if (x < minX || y < minY || x + sprite[0].Length > maxX || y + sprite.Count > maxY)
+        {
+            return;
+        }
 
         Console.ForegroundColor = fg;
         Console.BackgroundColor = bg;
@@ -21,7 +38,7 @@ public class CameraSystem() : GameSystem(dependencies: new Type[] {typeof(Positi
             int yIndex = 0;
             foreach (var line in lines)
             {
-                Console.SetCursorPosition(x, y+yIndex);
+                Console.SetCursorPosition(x + minX, y+yIndex);
                 Console.Write(line);
                 yIndex += 1;
             }
