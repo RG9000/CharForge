@@ -1,11 +1,15 @@
 ﻿using CharForge;
 using CharForge.Systems;
+using CharForge.Systems.Graphics;
 using CharForge.Systems.Physics;
 using Pong;
 
 var scene = new Scene();
 
 scene
+    .AddEntity(new Entity()
+        .AddSystem(new CameraSystem(50,30))
+        .AddSystem(new PositionSystem(0,0)))
     .AddEntity(new Player1Paddle())
     .AddEntity(new Player2Paddle())
     .AddEntity(new Ball())

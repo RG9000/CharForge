@@ -68,7 +68,7 @@ public abstract class GameSystem
         return Owner.GetDeltaTime();
     }
 
-    public void OnInit()
+    public virtual void OnInit()
     {
         if (Owner == null) return;
 

@@ -50,10 +50,10 @@ public class PlayerPaddleControlSystem(ConsoleKey upKey = ConsoleKey.W, ConsoleK
     public override void OnUpdate()
     {
         var positionSystem = GetDependentSystem<PositionSystem>();
-        if (GetCurrentKeyPressed() == UpKey){
+        if (GetCurrentKeyPressed() == UpKey && positionSystem.Y > 1){
             positionSystem.SetPosition(positionSystem.X, positionSystem.Y - 1);
         }
-        if (GetCurrentKeyPressed() == DownKey){
+        if (GetCurrentKeyPressed() == DownKey && positionSystem.Y < 19){
             positionSystem.SetPosition(positionSystem.X, positionSystem.Y + 1);
         }
 
