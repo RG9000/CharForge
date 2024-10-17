@@ -1,13 +1,16 @@
-using System.Net.Mail;
 using CharForge;
 using CharForge.Systems;
 
+namespace CharForge.Systems.Graphics;
+
 public class CameraSystem() : GameSystem(dependencies: new Type[] {typeof(PositionSystem)})
 {
-    protected List<List<List<char>>> Projection {get; set;}
-
     public void Draw(Func<List<string>>? fSprite, int x, int y, ConsoleColor fg = ConsoleColor.White, ConsoleColor bg = ConsoleColor.Black)
     {
+        var positionSystem = GetDependentSystem<PositionSystem>();
+
+        //HERE WE SHOULD FIGURE OUT IF THE SPRITE IS OUT OF BOUNDS ENTIRELY
+
         Console.ForegroundColor = fg;
         Console.BackgroundColor = bg;
 
