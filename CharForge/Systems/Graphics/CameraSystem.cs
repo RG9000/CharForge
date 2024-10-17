@@ -1,12 +1,20 @@
-using CharForge;
-using CharForge.Systems;
-
 namespace CharForge.Systems.Graphics;
 
-public class CameraSystem(int xSize, int ySize) : GameSystem(dependencies: new Type[] {typeof(PositionSystem)})
+public class CameraSystem(int xSize, int ySize, bool border = false) : GameSystem(dependencies: new Type[] {typeof(PositionSystem)})
 {
     private readonly int XSize = xSize;
     private readonly int YSize = ySize;
+
+    private readonly bool Border = border;
+
+    public override void OnInit()
+    {
+        if (Console.WindowWidth < XSize || Console.WindowHeight < YSize)
+        {
+            throw new Exception("A camera tried to render off the screen. Make your terminal window bigger, or zoom out.");
+        }
+        base.OnInit();
+    }
 
     public void Draw(Func<List<string>>? fSprite, int x, int y, ConsoleColor fg = ConsoleColor.White, ConsoleColor bg = ConsoleColor.Black)
     {
@@ -23,7 +31,7 @@ public class CameraSystem(int xSize, int ySize) : GameSystem(dependencies: new T
 
         if (sprite == null) return;
 
-        if (x < minX || y < minY || x + sprite[0].Length > maxX || y + sprite.Count > maxY)
+        if (x < minX+1 || y < minY+1 || x + sprite[0].Length > maxX || y + sprite.Count > maxY)
         {
             return;
         }
@@ -34,11 +42,11 @@ public class CameraSystem(int xSize, int ySize) : GameSystem(dependencies: new T
         Console.SetCursorPosition(x, y);
         if (fSprite != default && fSprite().Count > 0)
         {
-            var lines = fSprite();
+            var lines = sprite;
             int yIndex = 0;
             foreach (var line in lines)
             {
-                Console.SetCursorPosition(x + minX, y+yIndex);
+                Console.SetCursorPosition(x + minX, y+yIndex + minY);
                 Console.Write(line);
                 yIndex += 1;
             }
@@ -47,6 +55,34 @@ public class CameraSystem(int xSize, int ySize) : GameSystem(dependencies: new T
 
     public override void OnRender()
     {
+        if (Console.WindowWidth < XSize || Console.WindowHeight < YSize)
+        {
+            throw new Exception("A camera tried to render off the screen. Make your terminal window bigger, or zoom out.");
+        }
+        var positionSystem = GetDependentSystem<PositionSystem>();
+        if (Border)
+        {
+            int minX = (int)Math.Floor(positionSystem.X);
+            int minY = (int)Math.Floor(positionSystem.Y);
+            var maxX = minX + XSize;
+            var maxY = minY + YSize;
+               
+            var floor = new char[maxX];
+            Array.Fill(floor, '=');
+
+            Console.SetCursorPosition(0,0);
+            Console.WriteLine(floor);
+            Console.SetCursorPosition(0,maxY-1);
+            Console.WriteLine(floor);
+
+            for (int i = 0; i < YSize; i++)
+            {
+                Console.SetCursorPosition(minX, minY+i);
+                Console.Write('|');
+                Console.SetCursorPosition(maxX, minY+i);
+                Console.Write('|');
+            }
+        }
 
     }
 }

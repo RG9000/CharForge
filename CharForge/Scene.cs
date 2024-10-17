@@ -25,7 +25,6 @@ public class Scene(int targetFps = 20, bool showFPS = false)
         Console.ForegroundColor = ConsoleColor.White;
 
         Entities.ForEach(e => e.OnInit());
-        _ = Task.Run(ReadKeysAsync);
         _ = Task.Run(RenderLoop);
         await GameLoop();
     }
@@ -53,7 +52,7 @@ public class Scene(int targetFps = 20, bool showFPS = false)
             _keyBuffer = null;
             CurrentKeyPressed = ConsoleKey.None;
 
-            await Task.Delay(16);
+            await Task.Delay(50);
         }
     }
 
@@ -65,6 +64,17 @@ public class Scene(int targetFps = 20, bool showFPS = false)
 
             while (true)
             {
+                if (Console.KeyAvailable) // Check if a key has been pressed
+                {
+                    var key = Console.ReadKey(intercept: true);
+                    LastKeyPressed = key.Key;
+                    _keyBuffer = key.Key; // Store the input in a buffer
+
+                    if (key.KeyChar == 'q')
+                    {
+                        KillScene = true;
+                    }
+                }
 
                 // Record the start time of the frame
                 var frameStartTime = DateTime.Now;
@@ -122,26 +132,6 @@ public class Scene(int targetFps = 20, bool showFPS = false)
         return this;
     }
 
-    private async Task ReadKeysAsync()
-    {
-        while (true)
-        {
-            if (Console.KeyAvailable) // Check if a key has been pressed
-            {
-                var key = Console.ReadKey(intercept: true);
-                LastKeyPressed = key.Key;
-                _keyBuffer = key.Key; // Store the input in a buffer
-
-                if (key.KeyChar == 'q')
-                {
-                    KillScene = true;
-                }
-            }
-
-            // Small delay to avoid high CPU usage in the loop
-            await Task.Delay(50); // Adjust this delay as needed
-        }
-    }
     public void UpdateSystems(bool render)
     {
         var systems = new List<GameSystem>();

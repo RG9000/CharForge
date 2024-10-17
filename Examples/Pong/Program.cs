@@ -8,7 +8,7 @@ var scene = new Scene();
 
 scene
     .AddEntity(new Entity()
-        .AddSystem(new CameraSystem(20,20))
+        .AddSystem(new CameraSystem(50,30))
         .AddSystem(new PositionSystem(0,0)))
     .AddEntity(new Player1Paddle())
     .AddEntity(new Player2Paddle())
