@@ -1,4 +1,5 @@
-﻿using CharForge;
+﻿using System.Reflection.Metadata.Ecma335;
+using CharForge;
 using CharForge.Systems;
 using CharForge.Systems.Graphics;
 using CharForge.Systems.Physics;
@@ -8,8 +9,8 @@ var scene = new Scene();
 
 scene
     .AddEntity(new Entity()
-        .AddSystem(new CameraSystem(50,30))
-        .AddSystem(new PositionSystem(0,0)))
+        .AddSystem(new CameraSystem(40,40, true))
+        .AddSystem(new PositionSystem(15,12)))
     .AddEntity(new Player1Paddle())
     .AddEntity(new Player2Paddle())
     .AddEntity(new Ball())
@@ -28,7 +29,8 @@ scene
     //TOP
     .AddEntity(new Entity()
         .AddSystem(new PositionSystem(0,25))
-        .AddSystem(new CollisionSystem(33,1)));
+        .AddSystem(new CollisionSystem(33,1))
+    );
 
 await scene.Activate();
 
